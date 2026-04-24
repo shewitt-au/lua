@@ -436,7 +436,7 @@ static int handle_luainit (lua_State *L) {
 #include <io.h>
 #include <windows.h>
 
-#ifndef LUA_NO_UTF8_IN_STANDALONE_INTERPRETER
+#if defined(_WIN32) && !defined(LUA_WINDOWS_NO_UTF8_IN_STANDALONE_INTERPRETER) 
 #include <fcntl.h>
 #include <locale.h>
 
@@ -445,6 +445,7 @@ static void setup_utf8() {
   SetConsoleCP(CP_UTF8);
   SetConsoleOutputCP(CP_UTF8);
   _setmode(_fileno(stdout), _O_BINARY);
+  _setmode(_fileno(stderr), _O_BINARY);
   _setmode(_fileno(stdin), _O_BINARY);
 }
 #else
