@@ -436,6 +436,21 @@ static int handle_luainit (lua_State *L) {
 #include <io.h>
 #include <windows.h>
 
+#ifndef LUA_NO_UTF8_IN_STANDALONE_INTERPRETER
+#include <fcntl.h>
+#include <locale.h>
+
+static void setup_utf8() {
+  setlocale(LC_ALL, ".UTF-8");
+  SetConsoleCP(CP_UTF8);
+  SetConsoleOutputCP(CP_UTF8);
+  _setmode(_fileno(stdout), _O_BINARY);
+  _setmode(_fileno(stdin), _O_BINARY);
+}
+#else
+static void setup_utf8() {}
+#endif
+
 #define lua_stdin_is_tty()	_isatty(_fileno(stdin))
 
 #else				/* }{ */
@@ -767,10 +782,10 @@ static int pmain (lua_State *L) {
   return 1;
 }
 
-
 int main (int argc, char **argv) {
   int status, result;
   lua_State *L = luaL_newstate();  /* create state */
+  setup_utf8();
   if (L == NULL) {
     l_message(argv[0], "cannot create state: not enough memory");
     return EXIT_FAILURE;
